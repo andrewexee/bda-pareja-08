@@ -1,0 +1,19 @@
+id_campana,nombre,canal,fecha_inicio,fecha_fin,coste_eur,segmento_objetivo,leads,oportunidades,clientes_ganados,ingresos_atribuidos_eur
+CMP001,Feria Fruit Attraction 2024,feria,2024-10-02,2024-11-23,35631.52,agroalimentario,232,58,28,172163.29
+CMP002,Feria Breakbulk Europe 2024,feria,2024-07-03,2024-09-01,44562.19,minero,192,55,15,80999.03
+CMP003,LinkedIn Ads logística 2024,LinkedIn,2024-06-11,2024-08-01,13181.36,distribución,29,10,0,3841.49
+CMP004,LinkedIn Ads logística 2024,LinkedIn,2024-07-18,2024-09-10,12997.42,distribución,33,10,1,5012.3
+CMP005,Emailing cargadores 2024,email,2024-09-11,2024-11-09,2772.37,químico,22,6,1,3510.45
+CMP006,Emailing cargadores 2024,email,2024-03-12,2024-04-18,2773.75,químico,14,5,1,3817.97
+CMP007,Revista sectorial portuaria 2024,prensa,2024-04-18,2024-05-29,8417.96,energía,33,6,1,5152.76
+CMP008,Visitas comerciales Portugal 2024,comercial,2024-05-05,2024-05-09,15215.1,automoción,67,26,5,27830.52
+CMP009,Jornada puertas abiertas 2024,evento,2024-09-09,2024-10-14,6315.65,construcción,18,6,1,7405.37
+CMP010,Feria Fruit Attraction 2025,feria,2025-01-18,2025-03-18,39323.8,agroalimentario,233,70,37,140678.79
+CMP011,Feria Breakbulk Europe 2025,feria,2025-05-17,2025-06-21,42081.32,minero,174,67,16,81602.15
+CMP012,LinkedIn Ads logística 2025,LinkedIn,2025-11-05,2025-11-09,11284.17,distribución,35,6,0,4850.19
+CMP013,LinkedIn Ads logística 2025,LinkedIn,2025-01-02,2025-02-12,13111.9,distribución,11,1,0,5372.95
+CMP014,Emailing cargadores 2025,email,2025-10-19,2025-10-27,2991.06,químico,3,0,0,4316.15
+CMP015,Emailing cargadores 2025,email,2025-04-01,2025-05-02,3225.21,químico,13,4,1,3813.77
+CMP016,Revista sectorial portuaria 2025,prensa,2025-04-13,2025-05-26,9263.67,energía,27,6,1,5579.89
+CMP017,Visitas comerciales Portugal 2025,comercial,2025-03-01,2025-03-28,15908.94,automoción,60,20,5,23295.47
+CMP018,Jornada puertas abiertas 2025,evento,2025-06-08,2025-06-16,6567.32,construcción,26,4,0,7505.95
