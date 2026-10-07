@@ -7,8 +7,8 @@
 
 | | Miembro 1 | Miembro 2 |
 |---|---|---|
-| Nombre | | |
-| Usuario de GitHub | | |
+| Nombre |Andrés | |
+| Usuario de GitHub | andrewexee| |
 | Partes de las que es responsable principal | | |
 
 **Horas dedicadas aproximadas:** ___  ·  **Commit final:** `______`
