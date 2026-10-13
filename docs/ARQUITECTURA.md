@@ -28,12 +28,12 @@ flowchart LR
 ## 2. Zonas del lago de datos
 | Zona | Contenido | Formato | Particionado | Quién escribe | Retención |
 |---|---|---|---|---|---|
-| raw | | | | | |
-| bronze | | | | | |
-| silver | | | | | |
-| gold | | | | | |
-| cuarentena | | | | | |
-| control | | | | | |
+| raw |Datos tal cual llegan de cada fuente (AIS, escalas, sensores, contenedores, negocio, maestros), sin tocar | Originales (CSV/JSON)| Una carpeta por fuente| ingesta.sh (put -f)| Permanente: es el origen para reprocesar|
+| bronze | Los mismos datos con tipos correctos y linaje (_fichero_origen, _ingestado)| Parquet| Por fecha (AIS, sensores) y por año (escalas)| Spark (notebook F1)| Larga|
+| silver | Datos limpios, validados y sin duplicados| Parquet| Por fecha| Spark (fase 3)|Media (se regenera desde bronze) |
+| gold | Resúmenes y tablas de negocio listas para informes| Parquet| Sin particionar (tablas pequeñas)| Spark SQL| Se regenera cuando haga falta|
+| cuarentena | Filas con errores o corruptas, apartadas para revisarlas| Parquet| Por fecha de carga| Spark (fase 3)|Hasta revisarlas y corregir el origen |
+| control | Registro de qué se ha cargado y cuándo (ingestas.jsonl) y manifiesto| JSONL / sha256| Sin particionar| ingesta.sh	 |Permanente (auditoría)
 
 ## 3. Fuentes e ingesta
 | Fuente | Tipo | Frecuencia real | Volumen/día | Mecanismo propuesto | Idempotente |
