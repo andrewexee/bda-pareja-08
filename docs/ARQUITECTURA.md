@@ -36,9 +36,15 @@ flowchart LR
 | control | Registro de qué se ha cargado y cuándo (ingestas.jsonl) y manifiesto| JSONL / sha256| Sin particionar| ingesta.sh	 |Permanente (auditoría)
 
 ## 3. Fuentes e ingesta
+
 | Fuente | Tipo | Frecuencia real | Volumen/día | Mecanismo propuesto | Idempotente |
 |---|---|---|---|---|---|
-
+| AIS | Datos de posicionamiento de buques | Cada 5 minutos | Medio/alto (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+| Escalas | Datos de escalas de buques | Diaria, con actualizaciones cuando cambian las escalas | Bajo (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+| Sensores | Mediciones ambientales y operativas | Cada minuto | Medio/alto (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+| Contenedores | Registros de contenedores y movimientos | Cada hora | Medio (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+| Negocio | Datos de actividad y operaciones | Una vez al día, al cierre de la jornada | Bajo/medio (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+| Maestros | Tablas de referencia: buques, puertos y códigos | Una vez al día y cuando haya cambios relevantes | Bajo (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
 ## 4. Decisiones de diseño (registro)
 | Fecha | Decisión | Alternativas | Motivo |
 |---|---|---|---|
