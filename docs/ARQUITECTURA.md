@@ -41,8 +41,22 @@ flowchart LR
 |---|---|---|---|---|---|
 
 ## 4. Decisiones de diseño (registro)
+
 | Fecha | Decisión | Alternativas | Motivo |
 |---|---|---|---|
+| 14/10/2026 | Organizar el lago en las zonas raw, bronze, silver, gold, cuarentena y control | Utilizar una única zona o menos zonas | Separar los datos originales, los transformados, los resultados de negocio, los errores y los registros de auditoría. |
+| 14/10/2026 | Conservar los datos originales en raw sin modificarlos | Transformarlos directamente durante la ingesta | Permitir reprocesar los datos desde su origen si se detectan errores en las transformaciones. |
+| 14/10/2026 | Utilizar Parquet en bronze, silver, gold y cuarentena | CSV o JSON | Mejorar la eficiencia de almacenamiento y consulta analítica con Spark. |
+| 14/10/2026 | Particionar los datos por fecha o año según la fuente | No particionar o utilizar otro criterio | Facilitar las consultas por periodos y evitar leer datos innecesarios. |
+| 14/10/2026 | Utilizar HDFS como sistema de almacenamiento distribuido | Almacenamiento local en un único equipo | Distribuir los datos entre varios DataNodes y permitir la replicación de bloques. |
+| 14/10/2026 | Configurar dos DataNodes con factor de replicación 2 | Un único DataNode o más réplicas | Mantener dos copias de los bloques, siempre que estén disponibles en nodos distintos. |
+| 14/10/2026 | Utilizar YARN para gestionar los recursos de ejecución de Spark | Ejecutar Spark en modo local o sin gestor de recursos | Centralizar la asignación de recursos para los trabajos de procesamiento. |
+| 14/10/2026 | Ejecutar Spark bajo demanda con un driver y dos executors | Mantener los procesos ejecutándose continuamente o utilizar un único executor | Ajustar el consumo de recursos a las necesidades de procesamiento del proyecto. |
+| 14/10/2026 | Utilizar JupyterLab para desarrollar y ejecutar notebooks PySpark | Ejecutar todos los procesos exclusivamente mediante scripts | Facilitar la exploración de los datos, las pruebas y el desarrollo interactivo. |
+| 14/10/2026 | Utilizar Hive Metastore con PostgreSQL para catalogar las tablas | Gestionar las tablas sin catálogo centralizado | Centralizar los metadatos de las tablas de silver y gold. |
+| 14/10/2026 | Registrar las ingestas en control mediante ingestas.jsonl y hashes SHA-256 | No registrar las cargas o utilizar únicamente nombres de fichero | Facilitar la auditoría y detectar ficheros idénticos durante la ingesta. |
+| 14/10/2026 | Enviar las filas con errores a cuarentena | Detener todo el proceso o descartar las filas erróneas | Conservar los registros problemáticos para revisarlos sin perderlos silenciosamente. |
+| 14/10/2026 | Utilizar Spark History Server para consultar las ejecuciones | Revisar únicamente la salida de cada ejecución | Facilitar la depuración y el seguimiento de los trabajos de Spark. |
 
 ## 5. Componentes y recursos
 
