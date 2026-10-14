@@ -33,7 +33,7 @@ flowchart LR
 | silver | Datos limpios, validados y sin duplicados| Parquet| Por fecha| Spark (fase 3)|Media (se regenera desde bronze) |
 | gold | Resúmenes y tablas de negocio listas para informes| Parquet| Sin particionar (tablas pequeñas)| Spark SQL| Se regenera cuando haga falta|
 | cuarentena | Filas con errores o corruptas, apartadas para revisarlas| Parquet| Por fecha de carga| Spark (fase 3)|Hasta revisarlas y corregir el origen |
-| control | Registro de qué se ha cargado y cuándo (ingestas.jsonl) y manifiesto| JSONL / sha256| Sin particionar| ingesta.sh	 |Permanente (auditoría)
+| control | Registro de qué se ha cargado y cuándo (ingestas.jsonl) y manifiesto | JSONL / sha256 | Sin particionar | ingesta.sh | Permanente (auditoría) |
 
 ## 3. Fuentes e ingesta
 
