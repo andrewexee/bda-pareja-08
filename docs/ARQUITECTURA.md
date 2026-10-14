@@ -39,16 +39,23 @@ flowchart LR
 
 | Fuente | Tipo | Frecuencia real | Volumen/día | Mecanismo propuesto | Idempotente |
 |---|---|---|---|---|---|
-| AIS | Datos de posicionamiento de buques | Cada 5 minutos | Medio/alto (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
-| Escalas | Datos de escalas de buques | Diaria, con actualizaciones cuando cambian las escalas | Bajo (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
-| Sensores | Mediciones ambientales y operativas | Cada minuto | Medio/alto (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
-| Contenedores | Registros de contenedores y movimientos | Cada hora | Medio (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
-| Negocio | Datos de actividad y operaciones | Una vez al día, al cierre de la jornada | Bajo/medio (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
-| Maestros | Tablas de referencia: buques, puertos y códigos | Una vez al día y cuando haya cambios relevantes | Bajo (estimado) | `ingesta.sh` (CSV/JSON a `raw`) | Sí, por fichero |
+
 ## 4. Decisiones de diseño (registro)
 | Fecha | Decisión | Alternativas | Motivo |
 |---|---|---|---|
 
 ## 5. Componentes y recursos
+
 | Servicio | Función | Réplicas | Memoria |
 |---|---|---|---|
+| HDFS NameNode | Metadatos del sistema de ficheros: árbol de zonas (raw, bronze, silver, gold, cuarentena, control) y localización de bloques | 1 | 1 GB |
+| HDFS DataNode | Almacenamiento de bloques de datos (factor de replicación 2) | 2 | 1 GB c/u |
+| YARN ResourceManager | Planificación y reparto de recursos entre los jobs de Spark | 1 | 1 GB |
+| YARN NodeManager | Ejecuta los contenedores de Spark (driver y executors) | 2 | 3 GB c/u |
+| Spark (driver + executors) | Procesado bronze → silver → gold (notebook F1, fase 3 y Spark SQL). Se lanza bajo demanda sobre YARN | Dinámico (1 driver + 2 executors) | Driver 1 GB, executor 2 GB c/u (dentro de los NodeManager) |
+| Spark History Server | Histórico de ejecuciones, para auditar y depurar jobs | 1 | 1 GB |
+| Hive Metastore | Catálogo de tablas (gold, silver) para Spark SQL e informes | 1 | 1 GB |
+| PostgreSQL | Base de datos del Metastore | 1 | 512 MB |
+| JupyterLab | Entorno de notebooks (PySpark) para desarrollo y exploración | 1 | 2 GB |
+| Cliente de ingesta | Contenedor que ejecuta `ingesta.sh` (`hdfs dfs -put -f`) hacia raw y control | 1 | 256 MB |
+
