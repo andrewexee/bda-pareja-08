@@ -39,6 +39,12 @@ flowchart LR
 
 | Fuente | Tipo | Frecuencia real | Volumen/día | Mecanismo propuesto | Idempotente |
 |---|---|---|---|---|---|
+| **AIS** | Semiestructurados | Continua.| **2,1 MB lógicos**<br>6,2 MB físicos con réplicas | Kafka o MQTT + Spark Structured Streaming.| Sí.<br>Usar identificador, fecha y fichero de origen. |
+| **Escalas** | Estructurados | Por evento, al registrar una escala.| **1,5 KB lógicos**<br>4,6 KB físicos con réplicas | Carga incremental diaria desde el sistema portuario | Sí.<br>Usar `id_escala`. |
+| **Sensores IoT** | Estructurados | Continua.| **1,1 MB lógicos**<br>3,4 MB físicos con réplicas | MQTT o Kafka + Spark Structured Streaming hacia bronze. | Sí.<br>Usar sensor, fecha y timestamp. |
+| **Contenedores** | Estructurados| Por evento: carga, descarga o movimiento. | **0,11 MB lógicos**<br>0,34 MB físicos con réplicas | Eventos mediante Kafka o carga incremental diaria desde el TOS. | Sí.<br>Usar `id_movimiento`. |
+| **Negocio / ERP / redes** | Mixtos: estructurados y semiestructurados | Frecuencia mixta. | **0,016 MB lógicos**<br>0,049 MB físicos con réplicas | Extracciones del ERP mediante NiFi o API. | Sí.<br>Usar identificador y fecha de extracción. |
+| **Maestros** | Estructurados | Estática.<br>Solo cambia cuando se modifica el catálogo. | **No aplica**<br>No es una fuente diaria. | Carga inicial y pequeñas cargas de cambios mediante CSV o API. | Sí.<br>Reemplazar versión  |
 
 ## 4. Decisiones de diseño (registro)
 
