@@ -5,10 +5,10 @@
 
 ## 0. Datos de la pareja
 
-| | Miembro 1 | Miembro 2 |
-|---|---|---|
-| Nombre |Andrés |Álvaro |
-| Usuario de GitHub | andrewexee|AlvaroRamirez10 |
+| | Miembro 1 | Miembro 2 |Miembro 3 |
+|---|---|---|---|
+| Nombre |Andrés |Álvaro |Antonio |
+| Usuario de GitHub | andrewexee|AlvaroRamirez10 |AntonioDaw |
 | Partes de las que es responsable principal | | |
 
 **Horas dedicadas aproximadas:** ___  ·  **Commit final:** `______`
