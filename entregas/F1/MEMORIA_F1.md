@@ -299,9 +299,19 @@ Analizar con mayor detalle las operaciones del tercer trimestre de 2025 para ide
 
 ## 3. Problemas encontrados y cómo los resolvimos
 
+
+Durante el desarrollo de la práctica encontramos dificultades relacionadas con la lectura, transformación, almacenamiento y rendimiento de los datos.
+
 | Problema / mensaje de error | Causa | Solución | Fuente consultada |
 |---|---|---|---|
-| | | | |
+| 735 líneas AIS corruptas detectadas durante la lectura. | Algunos registros JSON estaban mal formados o incompletos. | Declaramos un esquema y configuramos Spark en modo `PERMISSIVE`, almacenando las líneas problemáticas en la columna `_corrupto` para poder identificarlas y revisarlas. | Documentación de Spark y registros AIS proporcionados. |
+| Diferentes formatos de fecha en los registros de escalas. | Los datos de origen no utilizaban un único formato de fecha y hora. | Se preparó una conversión que permite interpretar los formatos encontrados antes de realizar las operaciones con fechas. | Ficheros de escalas y funciones de PySpark. |
+| Facturas con separador y decimales diferentes del formato esperado. | El fichero utiliza `;` como separador y la coma como separador decimal. | Se indicó el separador correcto, se leyeron inicialmente las columnas como texto y se sustituyó la coma decimal por un punto antes de convertir los campos numéricos a `double`. | `facturas_2025.csv` y documentación de PySpark. |
+| Diferencias en los tiempos de las dos ejecuciones de la comparativa de formatos. | Los tiempos de ejecución pueden verse afectados por la caché, el calentamiento de Spark y la carga del equipo. | Se repitieron las mediciones y se conservaron los resultados de ambas ejecuciones para comparar los cambios, sin considerar los tiempos como valores absolutos. | Resultados de las dos ejecuciones del notebook. |
+| Riesgo de generar demasiados ficheros pequeños al particionar. | La escritura distribuida puede producir varios ficheros por partición, aumentando los metadatos y el trabajo de planificación. | Se explicó la necesidad de controlar la distribución de los datos antes de escribir y se utilizó el particionado por fecha o año según la fuente. | Documentación de Spark y pruebas de particionado. |
+| Diferencia entre tamaño lógico y espacio ocupado en HDFS. | HDFS puede mantener varias réplicas de los bloques almacenados. | Se tuvo en cuenta la replicación al interpretar el espacio ocupado y comparar los formatos. | Comandos de consulta de HDFS y configuración del entorno. |
+
+
 
 ## 4. Conclusiones y mejoras propuestas
 
