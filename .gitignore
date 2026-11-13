@@ -1,0 +1,9 @@
+# Archivos temporales de Jupyter
+.ipynb_checkpoints/
+
+# Archivos Python temporales
+__pycache__/
+*.pyc
+
+# Configuración local
+.env

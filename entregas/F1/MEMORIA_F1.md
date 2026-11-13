@@ -102,7 +102,44 @@ Particionar por fecha o año permite leer solo los periodos que necesita una con
 
 ### CE1.d · Procesamiento
 
-*Qué se espera:* Consultas Spark SQL (código + resultado) guardadas en /puerto/gold; zona bronze de todas las fuentes (TAREA D1).
+**TAREA D1 · Creación de la zona BRONZE**
+
+Se ha realizado la ingesta de las fuentes de datos pendientes en la zona BRONZE de HDFS, convirtiéndolas al formato Parquet y definiendo sus esquemas para establecer los tipos de datos adecuados.
+
+Se han procesado las siguientes fuentes:
+
+| Fuente | Registros |
+|---|---:|
+| Sensores | 1.348.728 |
+| Contenedores | 400.182 |
+| Muelles | 12 |
+| Navieras | 40 |
+| Buques | 320 |
+
+Para garantizar la trazabilidad de los datos, se han añadido dos columnas de linaje:
+
+- `_fichero_origen`: identifica el fichero de procedencia de cada registro.
+- `_ingestado`: registra la fecha y hora de ingesta.
+
+En el caso de los sensores, se ha creado la columna `fecha` a partir de `ts`, particionando los datos por fecha para facilitar las consultas posteriores. También se ha tenido en cuenta que las marcas temporales originales incluyen el desplazamiento horario `+02:00`.
+
+Los contenedores se han convertido a Parquet manteniendo sus campos y tipos de datos, transformando la columna `ts` a timestamp.
+
+Por último, se han procesado los tres ficheros maestros (`muelles`, `navieras` y `buques`), conservando los identificadores como texto cuando es necesario para evitar pérdidas de información.
+
+**Comprobación de resultados**
+
+Se ha verificado la correcta generación de los Parquet mediante su lectura con Spark, el recuento de registros y la consulta de los directorios de HDFS.
+
+Las fuentes se encuentran almacenadas en:
+
+- `/puerto/bronze/sensores`
+- `/puerto/bronze/contenedores`
+- `/puerto/bronze/maestros/muelles`
+- `/puerto/bronze/maestros/navieras`
+- `/puerto/bronze/maestros/buques`
+
+La comprobación confirma que las cinco fuentes procesadas se han almacenado correctamente en la zona BRONZE.
 
 
 
