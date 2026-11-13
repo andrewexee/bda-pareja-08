@@ -141,11 +141,159 @@ Las fuentes se encuentran almacenadas en:
 
 La comprobación confirma que las cinco fuentes procesadas se han almacenado correctamente en la zona BRONZE.
 
+**TAREA E1 · Consultas Spark SQL y generación de la zona GOLD**
 
+Se han registrado las vistas temporales necesarias para consultar las fuentes de la zona BRONZE y se han ejecutado tres consultas mediante Spark SQL. Los resultados se han almacenado en formato Parquet dentro de `/puerto/gold`.
+
+#### 1. Las 10 navieras con más toneladas en 2025
+
+**Consulta SQL:**
+
+```sql
+SELECT n.id_naviera, n.nombre AS naviera, n.pais,
+       t.escalas, t.miles_t
+FROM (
+    SELECT id_naviera,
+           COUNT(*) AS escalas,
+           ROUND(SUM(toneladas) / 1000, 1) AS miles_t
+    FROM escalas
+    WHERE year(eta) = 2025
+      AND toneladas BETWEEN 0 AND 500000
+    GROUP BY id_naviera
+    ORDER BY SUM(toneladas) DESC
+    LIMIT 10
+) t
+JOIN navieras n ON n.id_naviera = t.id_naviera
+ORDER BY t.miles_t DESC
+```
+
+**Resultado (primeras filas):**
+
+| Naviera | País | Escalas | Miles de toneladas |
+|---|---|---:|---:|
+| Azores Naviera | Italia | 131 | 3.597,8 |
+| Atlántica Naviera | Noruega | 125 | 3.560,3 |
+| Tinto Maritime | Noruega | 97 | 2.898,4 |
+| Iberia Maritime | España | 124 | 2.839,0 |
+| Mare Nostrum Maritime | Italia | 90 | 2.783,7 |
+
+**Qué responde:** identifica las diez navieras con mayor volumen de mercancías transportadas durante 2025, mostrando sus toneladas acumuladas y el número de escalas realizadas.
+
+**Almacenamiento:** `/puerto/gold/f1_top_navieras_2025`
+
+#### 2. Ocupación de cada muelle por mes
+
+**Consulta SQL:**
+
+```sql
+SELECT e.id_muelle,
+       m.nombre AS muelle,
+       date_format(e.ata, 'yyyy-MM') AS mes,
+       COUNT(*) AS escalas,
+       ROUND(SUM(
+           (unix_timestamp(e.atd) - unix_timestamp(e.ata)) / 3600
+       ), 1) AS horas_atracadas,
+       ROUND(SUM(
+           (unix_timestamp(e.atd) - unix_timestamp(e.ata)) / 3600
+       ) / (24 * dayofmonth(last_day(e.ata))) * 100, 1) AS ocupacion_pct
+FROM escalas e
+JOIN muelles m ON m.id_muelle = e.id_muelle
+WHERE e.ata IS NOT NULL
+  AND e.atd IS NOT NULL
+  AND e.atd >= e.ata
+GROUP BY e.id_muelle, m.nombre,
+         date_format(e.ata, 'yyyy-MM'),
+         dayofmonth(last_day(e.ata))
+ORDER BY e.id_muelle, mes
+```
+
+**Resultado (primeras filas):**
+
+| Muelle | Mes | Escalas | Horas atracadas | Ocupación (%) |
+|---|---|---:|---:|---:|
+| Muelle Sur | 2024-01 | 33 | 709,3 | 95,3 |
+| Muelle Sur | 2024-02 | 33 | 726,5 | 104,4 |
+| Muelle Sur | 2024-03 | 43 | 866,3 | 116,4 |
+| Muelle Sur | 2024-04 | 39 | 821,5 | 114,1 |
+| Muelle Sur | 2024-05 | 37 | 822,8 | 110,6 |
+
+**Qué responde:** permite analizar la actividad y ocupación mensual de cada muelle, identificando los periodos de mayor utilización. Los porcentajes superiores al 100 % reflejan que la suma de horas de atraque supera las horas naturales disponibles del mes, debido a posibles solapamientos entre escalas.
+
+**Almacenamiento:** `/puerto/gold/f1_ocupacion_muelles_mes`
+
+#### 3. Pregunta propia: ¿Cuántas horas al día se superarían los 14 m/s de viento?
+
+Se analiza la velocidad del viento registrada por el sensor METEO-01. Se considera que, por encima de 14 m/s, las grúas tendrían que detener su actividad.
+
+**Consulta SQL:**
+
+```sql
+SELECT fecha,
+       COUNT(DISTINCT ts) AS minutos_medidos,
+       COUNT(DISTINCT CASE
+           WHEN valor > 14 THEN ts
+       END) AS minutos_viento_fuerte,
+       ROUND(
+           COUNT(DISTINCT CASE
+               WHEN valor > 14 THEN ts
+           END) / 60.0, 1
+       ) AS horas_gruas_paradas,
+       ROUND(MAX(valor), 1) AS racha_max_ms
+FROM sensores
+WHERE id_sensor = 'METEO-01'
+  AND variable = 'viento_vel'
+  AND valor IS NOT NULL
+  AND valor BETWEEN 0 AND 60
+GROUP BY fecha
+ORDER BY horas_gruas_paradas DESC, fecha
+```
+
+**Resultado (primeras filas):**
+
+| Fecha | Minutos medidos | Minutos viento fuerte | Horas equivalentes | Máximo (m/s) |
+|---|---:|---:|---:|---:|
+| 2025-07-10 | 1.439 | 417 | 7,0 | 17,3 |
+| 2025-06-23 | 1.440 | 355 | 5,9 | 16,9 |
+| 2025-06-06 | 1.439 | 87 | 1,5 | 15,3 |
+| 2025-07-27 | 1.440 | 49 | 0,8 | 15,8 |
+| 2025-06-01 | 1.439 | 0 | 0,0 | 8,5 |
+
+**Qué responde:** identifica los días en los que las condiciones de viento podrían limitar la actividad de las grúas, cuantificando el tiempo diario por encima del umbral de 14 m/s.
+
+**Almacenamiento:** `/puerto/gold/f1_viento_fuerte_diario`
+
+#### Comprobación de almacenamiento
+
+Se ha comprobado mediante el listado de HDFS que los resultados de las tres consultas se han almacenado correctamente en la zona GOLD, en formato Parquet.
+
+- `/puerto/gold/f1_top_navieras_2025`
+- `/puerto/gold/f1_ocupacion_muelles_mes`
+- `/puerto/gold/f1_viento_fuerte_diario`
+
+Las consultas permiten obtener información sobre el tráfico marítimo, la ocupación de los muelles y las posibles limitaciones operativas provocadas por las condiciones meteorológicas.
 
 ### CE1.e · Presentación al cliente
 
 *Qué se espera:* Informe ejecutivo de 1 página: ≤ 3 gráficos, 3 conclusiones en lenguaje no técnico y 1 recomendación.
+
+
+#### Evolución de la espera
+
+Durante 2024, los portacontenedores mantuvieron una espera media relativamente estable, entre 4,5 y 5,4 horas por trimestre. La primera mitad de 2025 siguió una tendencia similar, pero en el tercer trimestre se produjo un fuerte aumento, hasta alcanzar las 15,6 horas de media. En el último trimestre la situación mejoró, aunque la espera todavía se situó por encima de los valores habituales.
+
+![Evolución trimestral de la espera media de los portacontenedores](espera_contenedores.png)
+
+#### Tres conclusiones principales
+
+1. **La espera aumentó considerablemente en 2025.** La media anual aproximada pasó de 4,9 horas en 2024 a 8,6 horas en 2025, un incremento cercano al 75 %.
+
+2. **El principal problema se concentró en el tercer trimestre.** La espera alcanzó las 15,6 horas, casi el triple que en el trimestre anterior. El número de escalas fue de 111, frente a las 87 del mismo trimestre de 2024.
+
+3. **La situación mejoró al final del año, pero no volvió a la normalidad.** En el cuarto trimestre la espera bajó a 8,1 horas, aunque siguió siendo un 50 % superior a la del cuarto trimestre de 2024.
+
+#### Recomendación
+
+Analizar con mayor detalle las operaciones del tercer trimestre de 2025 para identificar las causas del incremento de las esperas. Se recomienda revisar la planificación de atraques y la disponibilidad de muelles, y establecer un seguimiento periódico de los tiempos de espera para anticipar posibles congestiones y mejorar la coordinación de las llegadas de los buques.
 
 
 
