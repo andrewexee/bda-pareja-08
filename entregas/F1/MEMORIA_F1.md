@@ -315,12 +315,39 @@ Durante el desarrollo de la práctica encontramos dificultades relacionadas con 
 
 ## 4. Conclusiones y mejoras propuestas
 
+### Conclusiones
+
+1. **Parquet ZSTD fue el formato más eficiente en nuestras pruebas.** En la primera ejecución ocupó 7,6 MB, frente a los 63,6 MB del CSV y los 124,8 MB del JSON. También obtuvo los menores tiempos de consulta. La segunda ejecución confirmó que los tiempos pueden variar, por lo que conviene interpretar estas mediciones teniendo en cuenta las condiciones de ejecución.
+
+2. **La calidad de los datos es fundamental antes de analizarlos.** Durante la ingesta se detectaron 735 líneas AIS corruptas y se encontraron distintos formatos de fecha y números decimales. La declaración de esquemas y las conversiones permitieron preparar los datos para su posterior procesamiento.
+
+3. **Los datos procesados permiten obtener indicadores útiles para la gestión portuaria.** Las consultas SQL proporcionan información sobre las principales navieras, la ocupación mensual de los muelles y los días con viento superior al umbral establecido. Además, el análisis de la espera de los portacontenedores muestra un empeoramiento importante durante el tercer trimestre de 2025.
+
+### Mejoras propuestas
+
+- Incorporar controles automáticos de calidad para detectar registros incompletos, corruptos o con valores fuera de rango antes de incorporarlos a las zonas procesadas.
+- Estudiar una ingesta incremental para las fuentes que generan datos continuamente, como AIS y sensores, evitando tener que reprocesar todos los ficheros.
+- Ajustar el número y tamaño de los ficheros Parquet para evitar tanto la generación de demasiados ficheros pequeños como particiones excesivamente grandes.
+- Repetir las pruebas de rendimiento en condiciones controladas y comparar los resultados de varias ejecuciones.
+- Investigar las causas del incremento de la espera de los portacontenedores en el tercer trimestre de 2025, revisando la planificación de atraques, la disponibilidad de muelles y la posible influencia de las condiciones meteorológicas.
+
+
 
 ## 5. Declaración de uso de herramientas
 
-Indicad qué herramientas de IA o fuentes externas habéis usado, **para qué** y qué parte es vuestra.
-Recordad: el profesor puede pedir a cualquier miembro que defienda oralmente cualquier parte. Lo que no se sepa explicar se considera no realizado (cláusula de autoría de la programación).
+Durante el desarrollo de la práctica se han utilizado las siguientes herramientas y fuentes:
 
 | Herramienta / fuente | Para qué | Partes afectadas |
 |---|---|---|
-| | | |
+| Docker Desktop y WSL2 | Ejecución y administración del entorno de trabajo y sus servicios. | Preparación del entorno y ejecución de la práctica. |
+| HDFS / Hadoop | Almacenamiento de los ficheros y consulta de las zonas del lago de datos. | Ingesta, almacenamiento y comprobación de resultados. |
+| Apache Spark y PySpark | Lectura de datos, declaración de esquemas, transformaciones, particionado y generación de ficheros Parquet. | Apartados de ingesta y procesamiento. |
+| Spark SQL | Ejecución de consultas analíticas y generación de resultados en la zona GOLD. | Consultas de navieras, ocupación de muelles y viento. |
+| Python y pandas | Tratamiento de datos y apoyo a las comparativas realizadas en el notebook. | Comparativa de formatos y análisis. |
+| Matplotlib | Representación gráfica de los tamaños, tiempos de ejecución y resultados del análisis. | Apartados de formato y presentación al cliente. |
+| JupyterLab / Jupyter Notebook | Desarrollo, ejecución y documentación de las celdas de código. | Notebook de la práctica. |
+| Git y GitHub | Control de versiones y conservación del trabajo realizado por el equipo. | Repositorio y entrega. |
+| ChatGPT (OpenAI) | Apoyo para resolver dudas, interpretar resultados, revisar código y preparar borradores de documentación y conclusiones. | Revisión y redacción de la memoria. |
+| Datos proporcionados para la práctica y `docs/ARQUITECTURA.md` | Fuentes de datos y referencia para el diseño de la arquitectura. | Apartados de arquitectura, ingesta y procesamiento. |
+
+El código, las consultas y los resultados numéricos se han ejecutado y comprobado en el entorno del proyecto. ChatGPT se ha utilizado como herramienta de apoyo para comprender conceptos, revisar el trabajo y mejorar la documentación. Las decisiones técnicas, las comprobaciones y la validación final corresponden al equipo, cuyos integrantes deben conocer y poder explicar las partes realizadas.
