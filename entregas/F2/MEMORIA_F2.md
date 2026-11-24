@@ -32,9 +32,7 @@
 ### CE2.a · Importancia del almacenamiento distribuido
 
 *Qué se espera:* Reparto de bloques y réplicas (fsck + dibujo), comparación bloque 8 MB / 2 réplicas, explicación NameNode/DataNode.
-
-
-
+![alt text](image.png)
 ### CE2.b · Poder de la computación distribuida
 
 *Qué se espera:* MapReduce vs Spark (wordcount), job/stages/tasks en la interfaz de Spark, tabla y gráfico de speedup, Amdahl, efecto de las particiones.
